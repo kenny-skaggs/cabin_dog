@@ -7,30 +7,10 @@ const e = React.createElement;
 class ExpenseItem extends React.Component {
     render () {
         return (
-            <div>
-                <span style={{
-                    'width': '5em',
-                    'display': 'inline-block',
-                    'paddingRight': '10px'
-                }}>
-                    {this.props.date}
-                </span>
-                <span style={{
-                    'width': '4em',
-                    'display': 'inline-block',
-                    'textAlign': 'right',
-                    'paddingRight': '2em'
-                }}>
-                    {this.props.amount.toFixed(2)}
-                </span>
-                <span style={{
-                    'width': '10em',
-                    'display': 'inline-block',
-                    'paddingRight': '2em'
-                }}
-                >
-                    {this.props.description}
-                </span>
+            <div className='expense-item'>
+                <span className='date'>{this.props.date}</span>
+                <span className='amount'>{this.props.amount.toFixed(2)}</span>
+                <span className='description'>{this.props.description}</span>
                 <span>{this.props.payedBy}</span>
             </div>
         );
