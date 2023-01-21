@@ -6,7 +6,7 @@ module.exports = {
     cache: {
         type: 'filesystem',
     },
-    entry: path.join(__dirname, 'src', 'app.js'),
+    entry: path.join(__dirname, 'src', 'main.js'),
     output: {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
