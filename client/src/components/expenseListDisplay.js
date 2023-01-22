@@ -1,4 +1,6 @@
-export class ExpenseItem extends React.Component {
+import React, {Component} from 'react';
+
+export class ExpenseItem extends Component {
     render () {
         return (
             <tr className='expense-item'>
@@ -11,7 +13,7 @@ export class ExpenseItem extends React.Component {
     }
 }
 
-export class ExpenseList extends React.Component {
+export class ExpenseList extends Component {
     render() {
         return (
             <table className="table is-striped is-fullwidth">

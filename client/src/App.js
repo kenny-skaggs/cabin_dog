@@ -1,15 +1,28 @@
+import axios from 'axios';
+import React, {Component} from 'react';
+
 import './app.sass';
 
 import {ExpenseItem, ExpenseList} from './components/expenseListDisplay';
 import {AddNewItemModal} from './components/itemModal';
 
-export class App extends React.Component {
+
+Date.prototype.toDateInputValue = (function() {
+    let local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0, 10);
+});
+
+
+export class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             expenses: [],
+            personList: [],
             msg: 'loading',
-            showingNewItemModal: false
+            showingNewItemModal: false,
+            editingItem: null,
         }
     }
 
@@ -19,6 +32,9 @@ export class App extends React.Component {
             this.setState({expenses: response.data});
             this.setState({msg: 'done loading'});
         });
+        axios.get('/person/').then((response) => {
+            this.setState({personList: response.data});
+        })
     }
 
     showNewItemModal = () => {
@@ -44,6 +60,10 @@ export class App extends React.Component {
                     <ExpenseList expense_list={this.state.expenses} />
                 </div>
                 <AddNewItemModal
+                    date={new Date().toDateInputValue()}
+                    amount={''}
+                    description={''}
+                    personList={this.state.personList}
                     showModal={this.state.showingNewItemModal}
                     onCancel={this.closeNewItemModel}
                 />
