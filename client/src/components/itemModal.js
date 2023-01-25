@@ -1,48 +1,43 @@
 import React, {Component} from 'react';
 
 export class AddNewItemModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            date: props.date,
-            amount: props.amount,
-            description: props.description,
-            personId: 1
-        }
-    }
-
-    onDateChange = (event) => {
-        this.setState({date: event.target.value});
-    }
 
     onAmountChange = (event) => {
         const newValue = event.target.value;
         const partList = newValue.split('.');
         if (partList.length == 1 || (partList.length == 2 && partList[1].length < 3)) {
-            this.setState({amount: event.target.value});
+            this.props.onItemPropertyChanged('amount', event.target.value)
         }
     }
+
+    onChange = (fieldName) => (
+        (event) => {
+            this.props.onItemPropertyChanged(fieldName, event.target.value);
+        }
+    )
 
     onDescriptionChange = (event) => {
         this.setState({description: event.target.value});
     }
 
-    onPersonChange = (event) => {
-        this.setState({personId: event.target.value});
-    }
-
     onSubmit = () => {
-        console.log({
-            amount: this.state.amount,
-            date: this.state.date,
-            description: this.state.description,
-            personId: this.state.personId
-        })
+        this.props.onSubmit();
     }
 
     render () {
         if (!this.props.showModal) {
             return null;
+        }
+
+        let editItemControls = '';
+        if (this.props.id) {
+            editItemControls = (
+                <div className='buttons is-pulled-left'>
+                    <button className='button is-danger' onClick={this.props.onDelete}>
+                        Delete
+                    </button>
+                </div>
+            )
         }
 
         return (
@@ -57,7 +52,7 @@ export class AddNewItemModal extends Component {
                                 placeholder='Amount'
                                 step='0.01'
                                 onChange={this.onAmountChange}
-                                value={this.state.amount}
+                                value={this.props.amount}
                             />
                             <span className='icon is-left'>
                                 <i className='fas fa-sack-dollar' />
@@ -70,8 +65,8 @@ export class AddNewItemModal extends Component {
                                 className='input' 
                                 type='date' 
                                 placeholder='Date' 
-                                onChange={this.onDateChange}
-                                value={this.state.date}
+                                onChange={this.onChange('date')}
+                                value={this.props.date}
                             />
                             <span className='icon is-left'>
                                 <i className='far fa-calendar' />
@@ -80,7 +75,12 @@ export class AddNewItemModal extends Component {
                     </div>
                     <div className='field'>
                         <p className='control has-icons-left'>
-                            <input className='input' placeholder='Description' onChange={this.onDescriptionChange}/>
+                            <input
+                                className='input' 
+                                placeholder='Description' 
+                                onChange={this.onChange('description')}
+                                value={this.props.description}
+                            />
                             <span className='icon is-left'>
                                 <i className='fas fa-comment' />
                             </span>
@@ -89,7 +89,10 @@ export class AddNewItemModal extends Component {
                     <div className='field'>
                         <div className='control has-icons-left'>
                             <div className='select is-fullwidth'>
-                                <select onChange={this.onPersonChange} value={this.state.personId}>
+                                <select 
+                                    onChange={this.onChange('payed_by')} 
+                                    value={this.props.payed_by}
+                                >
                                     {this.props.personList.map((person) => (
                                         // todo: default this to current user
                                         <option
@@ -107,9 +110,12 @@ export class AddNewItemModal extends Component {
                         </div>
                     </div>
                     <div className='buttons is-pulled-right'>
-                        <button className='button is-success' onClick={this.onSubmit}>Add</button>
+                        <button className='button is-success' onClick={this.onSubmit}>
+                            {this.props.id ? 'Save' : 'Add'}
+                        </button>
                         <button className='button' onClick={this.props.onCancel}>Cancel</button>
                     </div>
+                    {editItemControls}
                 </div>
             </div>
         );
