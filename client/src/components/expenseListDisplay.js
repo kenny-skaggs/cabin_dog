@@ -25,11 +25,22 @@ export class ExpenseItem extends Component {
 }
 
 export class ExpenseList extends Component {
+
+    _compareDates = (a, b) => {
+        if (a.date > b.date) {
+            return 1;
+        } else if (a.date < b.date) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
     render() {
         return (
             <table className="table is-striped is-fullwidth">
                 <tbody>
-                    {this.props.expense_list.map((expense) => (
+                    {this.props.expense_list.sort(this._compareDates).map((expense) => (
                         <ExpenseItem
                             id={expense.id}
                             amount={expense.amount}

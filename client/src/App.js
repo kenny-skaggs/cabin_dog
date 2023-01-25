@@ -57,15 +57,41 @@ export class App extends Component {
         });
     }
 
-    submitNewItemModel = () => {
+    submitItemModel = () => {
         const item = this.state.editingItem;
-        const url = item.id ? `/expenses/${item.id}/` : '/expenses';
-        const method = item.id ? axios.put : axios.post;
-        method(url, item).then(this.closeNewItemModel);
+        if (item.id) {
+            this._editItem(item);
+        } else {
+            this._addNewItem(item);
+        }
+    }
+
+    _addNewItem = (item) => {
+        axios.post('/expenses/', item).then((response) => {
+            this.setState({
+                expenses: [
+                    ...this.state.expenses,
+                    response.data
+                ]
+            })
+            this.closeNewItemModel();
+        });
+    }
+
+    _editItem = (item) => {
+        axios.put(`/expenses/${item.id}/`, item).then(() => {
+            this.closeNewItemModel();
+        });
     }
 
     onDeleteItem = () => {
-        axios.delete(`/expenses/${this.state.editingItem.id}/`).then(this.closeNewItemModel);
+        const deletedId = this.state.editingItem.id;
+        axios.delete(`/expenses/${deletedId}/`).then(() => {
+            this.setState({
+                expenses: this.state.expenses.filter(item => item.id != deletedId)
+            });
+            this.closeNewItemModel();
+        });
     }
 
     closeNewItemModel = () => {
@@ -99,7 +125,7 @@ export class App extends Component {
                     personList={this.state.personList}
                     showModal={this.state.showingNewItemModal}
                     onItemPropertyChanged={this.onItemPropertyChanged}
-                    onSubmit={this.submitNewItemModel}
+                    onSubmit={this.submitItemModel}
                     onDelete={this.onDeleteItem}
                     onCancel={this.closeNewItemModel}
                 />
