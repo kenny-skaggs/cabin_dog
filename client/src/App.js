@@ -116,10 +116,14 @@ export class App extends Component {
 
     render() {
         let expenseListView = '';
-        if (this.state.expenses.length > 0) {
+        if (this.state.expenses.length > 0 && this.state.personList.length > 0) {
             expenseListView = (
                 <div className="container">
-                    <ExpenseList expense_list={this.state.expenses} onEditItem={this.onEditItemClicked} />
+                    <ExpenseList
+                        expenseList={this.state.expenses}
+                        personList={this.state.personList}
+                        onEditItem={this.onEditItemClicked}
+                    />
                 </div>
             )
         }

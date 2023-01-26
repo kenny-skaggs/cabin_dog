@@ -32,7 +32,7 @@ class ExpenseItem extends Component {
                 <td className='date'>{this.props.date}</td>
                 <td className='amount'>{this.props.amount.toFixed(2)}</td>
                 <td className='description'>{this.props.description}</td>
-                <td className='paid-by'>{this.props.paid_by}</td>
+                <td className='paid-by'>{this.props.paid_by.name}</td>
                 <td><span className='is-clickable' onClick={this.onEditClicked}>edit</span></td>
             </motion.tr>
         );
@@ -54,17 +54,18 @@ export class ExpenseList extends Component {
     }
 
     render() {
+        console.log(this.props.personList);
         return (
             <motion.table className="table is-striped is-fullwidth">
                 <motion.tbody>
                     <AnimatePresence initial={false} mode='popLayout'>
-                        {this.props.expense_list.sort(this._compareDates).map((expense) => (
+                        {this.props.expenseList.sort(this._compareDates).map((expense) => (
                             <ReffedItem
                                 id={expense.id}
                                 amount={expense.amount}
                                 description={expense.description}
                                 date={expense.date}
-                                paid_by={expense.paid_by}
+                                paid_by={this.props.personList.find(person => person.id == expense.paid_by)}
                                 key={expense.id}
                                 onEditItem={this.props.onEditItem}
                             />
