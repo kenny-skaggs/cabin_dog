@@ -9,7 +9,7 @@ export class AddNewItemModal extends Component {
         const newValue = event.target.value;
         const partList = newValue.split('.');
         if (partList.length == 1 || (partList.length == 2 && partList[1].length < 3)) {
-            this.props.onItemPropertyChanged('amount', event.target.value)
+            this.props.onItemPropertyChanged('amount', parseFloat(event.target.value))
         }
     }
 

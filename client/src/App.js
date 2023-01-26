@@ -75,13 +75,20 @@ export class App extends Component {
                     ...this.state.expenses,
                     response.data
                 ]
-            })
+            });
             this.closeNewItemModel();
         });
     }
 
     _submitEditItem = (item) => {
-        axios.put(`/expenses/${item.id}/`, item).then(() => {
+        const replacedId = item.id;
+        axios.put(`/expenses/${replacedId}/`, item).then(() => {
+            this.setState({
+                expenses: [
+                    ...this.state.expenses.filter(possibleMatch => possibleMatch.id != replacedId),
+                    item
+                ]
+            });
             this.closeNewItemModel();
         });
     }
