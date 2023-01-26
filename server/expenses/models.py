@@ -11,4 +11,4 @@ class Expense(models.Model):
     amount = models.FloatField()
     date = models.DateField()
     # todo: add calc category functionality (how much the cost should be shared)
-    payed_by = models.ForeignKey(Person, on_delete=models.CASCADE)
+    paid_by = models.ForeignKey(Person, on_delete=models.CASCADE)

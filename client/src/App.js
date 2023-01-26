@@ -22,7 +22,7 @@ export class App extends Component {
             personList: [],
             msg: 'loading',
             showingNewItemModal: false,
-            editingItem: this.getNewItem(),
+            editingItem: this.getNewItem()
         }
     }
 
@@ -40,7 +40,8 @@ export class App extends Component {
     getNewItem = () => ({
         date: new Date().toDateInputValue(),
         amount: '',
-        description: ''
+        description: '',
+        paid_by: 1
     })
 
     onEditItem = (item) => {
@@ -106,6 +107,15 @@ export class App extends Component {
     }
 
     render() {
+        let expenseListView = '';
+        if (this.state.expenses.length > 0) {
+            expenseListView = (
+                <div className="container">
+                    <ExpenseList expense_list={this.state.expenses} onEditItem={this.onEditItem} />
+                </div>
+            )
+        }
+
         return (
             <div>
                 <div className='top-bar is-clearfix'>
@@ -116,9 +126,7 @@ export class App extends Component {
                         Add New
                     </button>
                 </div>
-                <div className="container">
-                    <ExpenseList expense_list={this.state.expenses} onEditItem={this.onEditItem} />
-                </div>
+                {expenseListView}
                 <AddNewItemModal
                     key={this.state.editingItem.id}
                     {...this.state.editingItem}

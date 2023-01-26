@@ -90,8 +90,8 @@ export class AddNewItemModal extends Component {
                         <div className='control has-icons-left'>
                             <div className='select is-fullwidth'>
                                 <select 
-                                    onChange={this.onChange('payed_by')} 
-                                    value={this.props.payed_by}
+                                    onChange={this.onChange('paid_by')} 
+                                    value={this.props.paid_by}
                                 >
                                     {this.props.personList.map((person) => (
                                         // todo: default this to current user
