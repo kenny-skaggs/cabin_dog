@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 
 import './app.sass';
 
+import Button from './components/Button';
 import {ExpenseItem, ExpenseList} from './components/expenseListDisplay';
 import {AddNewItemModal} from './components/itemModal';
 
@@ -120,11 +121,11 @@ export class App extends Component {
             <div>
                 <div className='top-bar is-clearfix'>
                     <div className='title is-pulled-left'>Cabin Dog -- {this.state.msg} </div>
-                    <button className='button is-pulled-right'
+                    <Button className='is-pulled-right'
                             onClick={this.showNewItemModal}
                     >
                         Add New
-                    </button>
+                    </Button>
                 </div>
                 {expenseListView}
                 <AddNewItemModal
