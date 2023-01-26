@@ -24,10 +24,30 @@ export class AddNewItemModal extends Component {
     }
 
     onSubmit = () => {
+        if (
+            isNaN(parseFloat(this.props.amount))
+            || this.props.date === ''
+            || this.props.description === ''
+            || isNaN(parseInt(this.props.paid_by))
+        ) {
+            return;
+        }
+
         this.props.onSubmit();
     }
 
     render () {
+        let editItemControls = '';
+        if (this.props.id) {
+            editItemControls = (
+                <div className='buttons is-pulled-left'>
+                    <button className='button is-danger' onClick={this.props.onDelete}>
+                        Delete
+                    </button>
+                </div>
+            )
+        }
+
         let content = null;
         if (this.props.showModal) {
             content = (
@@ -37,7 +57,8 @@ export class AddNewItemModal extends Component {
                     className='modal is-active'
                 >
                     <div className='modal-background'></div>
-                    <motion.div 
+                    <motion.form 
+                        onSubmit={(event) => event.preventDefault()}
                         className='modal-content box'
                         initial={{scale: 0.8}} animate={{scale: 1}} exit={{scale: 0.8}}
                     >
@@ -50,6 +71,8 @@ export class AddNewItemModal extends Component {
                                     step='0.01'
                                     onChange={this.onAmountChange}
                                     value={this.props.amount}
+                                    required
+                                    autoFocus
                                 />
                                 <span className='icon is-left'>
                                     <i className='fas fa-sack-dollar' />
@@ -77,6 +100,7 @@ export class AddNewItemModal extends Component {
                                     placeholder='Description' 
                                     onChange={this.onChange('description')}
                                     value={this.props.description}
+                                    required
                                 />
                                 <span className='icon is-left'>
                                     <i className='fas fa-comment' />
@@ -113,19 +137,8 @@ export class AddNewItemModal extends Component {
                             <Button onClick={this.props.onCancel}>Cancel</Button>
                         </div>
                         {editItemControls}
-                    </motion.div>
+                    </motion.form>
                 </motion.div>
-            )
-        }
-
-        let editItemControls = '';
-        if (this.props.id) {
-            editItemControls = (
-                <div className='buttons is-pulled-left'>
-                    <button className='button is-danger' onClick={this.props.onDelete}>
-                        Delete
-                    </button>
-                </div>
             )
         }
 
