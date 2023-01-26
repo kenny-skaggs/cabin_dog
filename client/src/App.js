@@ -23,7 +23,7 @@ export class App extends Component {
             personList: [],
             msg: 'loading',
             showingNewItemModal: false,
-            editingItem: this.getNewItem()
+            editingItem: this.getNewItemTemplate()
         }
     }
 
@@ -38,23 +38,23 @@ export class App extends Component {
         })
     }
 
-    getNewItem = () => ({
+    getNewItemTemplate = () => ({
         date: new Date().toDateInputValue(),
         amount: '',
         description: '',
         paid_by: 1
     })
 
-    onEditItem = (item) => {
+    onEditItemClicked = (item) => {
         this.setState({
             editingItem: item,
             showingNewItemModal: true
         });
     }
 
-    showNewItemModal = () => {
+    onNewItemClicked = () => {
         this.setState({
-            editingItem: this.getNewItem(),
+            editingItem: this.getNewItemTemplate(),
             showingNewItemModal: true
         });
     }
@@ -62,13 +62,13 @@ export class App extends Component {
     submitItemModel = () => {
         const item = this.state.editingItem;
         if (item.id) {
-            this._editItem(item);
+            this._submitEditItem(item);
         } else {
-            this._addNewItem(item);
+            this._submitNewItem(item);
         }
     }
 
-    _addNewItem = (item) => {
+    _submitNewItem = (item) => {
         axios.post('/expenses/', item).then((response) => {
             this.setState({
                 expenses: [
@@ -80,13 +80,13 @@ export class App extends Component {
         });
     }
 
-    _editItem = (item) => {
+    _submitEditItem = (item) => {
         axios.put(`/expenses/${item.id}/`, item).then(() => {
             this.closeNewItemModel();
         });
     }
 
-    onDeleteItem = () => {
+    onDeleteItemClicked = () => {
         const deletedId = this.state.editingItem.id;
         axios.delete(`/expenses/${deletedId}/`).then(() => {
             this.setState({
@@ -112,7 +112,7 @@ export class App extends Component {
         if (this.state.expenses.length > 0) {
             expenseListView = (
                 <div className="container">
-                    <ExpenseList expense_list={this.state.expenses} onEditItem={this.onEditItem} />
+                    <ExpenseList expense_list={this.state.expenses} onEditItem={this.onEditItemClicked} />
                 </div>
             )
         }
@@ -121,8 +121,9 @@ export class App extends Component {
             <div>
                 <div className='top-bar is-clearfix'>
                     <div className='title is-pulled-left'>Cabin Dog -- {this.state.msg} </div>
-                    <Button className='is-pulled-right'
-                            onClick={this.showNewItemModal}
+                    <Button
+                        className='is-pulled-right'
+                        onClick={this.onNewItemClicked}
                     >
                         Add New
                     </Button>
@@ -135,7 +136,7 @@ export class App extends Component {
                     showModal={this.state.showingNewItemModal}
                     onItemPropertyChanged={this.onItemPropertyChanged}
                     onSubmit={this.submitItemModel}
-                    onDelete={this.onDeleteItem}
+                    onDelete={this.onDeleteItemClicked}
                     onCancel={this.closeNewItemModel}
                 />
             </div>
