@@ -132,16 +132,13 @@ export class App extends Component {
             <div>
                 <div className='top-bar is-clearfix'>
                     <div className='title is-pulled-left'>Cabin Dog -- {this.state.msg} </div>
-                    <Button
-                        className='is-pulled-right'
-                        onClick={this.onNewItemClicked}
-                    >
-                        Add New
-                    </Button>
+                    <div className='buttons is-pulled-right'>
+                        <Button disabled>Calculate</Button>
+                        <Button onClick={this.onNewItemClicked}>Add New</Button>
+                    </div>
                 </div>
                 {expenseListView}
                 <AddNewItemModal
-                    key={this.state.editingItem.id}
                     {...this.state.editingItem}
                     personList={this.state.personList}
                     showModal={this.state.showingNewItemModal}
