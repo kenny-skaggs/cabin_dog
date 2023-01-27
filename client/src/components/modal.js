@@ -10,7 +10,12 @@ export default class Modal extends Component {
                 className='modal is-active'
             >
                 <div className='modal-background'></div>
-                {this.props.children}
+                <motion.div
+                    className='modal-content box'
+                    initial={{scale: 0.8}} animate={{scale: 1}} exit={{scale: 0.8}}
+                >
+                    {this.props.children}
+                </motion.div>
             </motion.div>
         );
         return (

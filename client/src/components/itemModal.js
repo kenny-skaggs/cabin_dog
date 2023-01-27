@@ -1,4 +1,3 @@
-import {AnimatePresence, motion} from 'framer-motion';
 import React, {Component} from 'react';
 
 import Button from './Button';
@@ -56,11 +55,7 @@ export class AddNewItemModal extends Component {
 
         return (
             <Modal showModal={this.props.showModal}>
-                <motion.form 
-                    onSubmit={(event) => event.preventDefault()}
-                    className='modal-content box'
-                    initial={{scale: 0.8}} animate={{scale: 1}} exit={{scale: 0.8}}
-                >
+                <form onSubmit={(event) => event.preventDefault()}>
                     <div className='field'>
                         <p className='control has-icons-left'>
                             <input 
@@ -136,7 +131,7 @@ export class AddNewItemModal extends Component {
                         <Button onClick={this.onCancel}>Cancel</Button>
                     </div>
                     {editItemControls}
-                </motion.form>
+                </form>
             </Modal>
         )
     }

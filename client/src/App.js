@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import './app.sass';
 
 import Button from './components/Button';
+import CalculateModal from './components/calculationModal';
 import {ExpenseItem, ExpenseList} from './components/expenseListDisplay';
 import {AddNewItemModal} from './components/itemModal';
 
@@ -23,6 +24,7 @@ export class App extends Component {
             personList: [],
             msg: 'loading',
             showingNewItemModal: false,
+            showingCalculationModal: false,
             editingItem: this.getNewItemTemplate()
         }
     }
@@ -133,7 +135,7 @@ export class App extends Component {
                 <div className='top-bar is-clearfix'>
                     <div className='title is-pulled-left'>Cabin Dog -- {this.state.msg} </div>
                     <div className='buttons is-pulled-right'>
-                        <Button disabled>Calculate</Button>
+                        <Button onClick={() => this.setState({showingCalculationModal: true})}>Calculate</Button>
                         <Button onClick={this.onNewItemClicked}>Add New</Button>
                     </div>
                 </div>
@@ -146,6 +148,12 @@ export class App extends Component {
                     onSubmit={this.submitItemModel}
                     onDelete={this.onDeleteItemClicked}
                     onCancel={this.closeNewItemModel}
+                />
+                <CalculateModal
+                    personList={this.state.personList}
+                    expenseList={this.state.expenses}
+                    showModal={this.state.showingCalculationModal}
+                    onCancel={() => this.setState({showingCalculationModal: false})}
                 />
             </div>
         );
