@@ -37,14 +37,15 @@ export class App extends Component {
         });
         axios.get('/person/').then((response) => {
             this.setState({personList: response.data});
-        })
+        });
     }
 
     getNewItemTemplate = () => ({
         date: new Date().toDateInputValue(),
         amount: '',
         description: '',
-        paid_by: 1
+        paid_by: 1,
+        recurs_monthly: false
     })
 
     onEditItemClicked = (item) => {
@@ -159,3 +160,12 @@ export class App extends Component {
         );
     }
 }
+
+// todo:
+//  login / pay-space
+//  marking items as paid
+//  manage payers
+
+// maybe:
+//  loading spinner
+//  auto-recurring items

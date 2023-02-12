@@ -13,6 +13,10 @@ export class AddNewItemModal extends Component {
         }
     }
 
+    onRecursChange = (event) => {
+        this.props.onItemPropertyChanged('recurs_monthly', event.target.checked);
+    }
+
     onChange = (fieldName) => (
         (event) => {
             this.props.onItemPropertyChanged(fieldName, event.target.value);
@@ -122,6 +126,16 @@ export class AddNewItemModal extends Component {
                             <span className='icon is-left'>
                                 <i className='fas fa-user' />
                             </span>
+                        </div>
+                    </div>
+                    <div className='field'>
+                        <div className='control'>
+                            <label className='checkbox'>
+                                <input type='checkbox'
+                                    onChange={this.onRecursChange} 
+                                    checked={this.props.recurs_monthly}
+                                /> Recurs monthly
+                            </label>
                         </div>
                     </div>
                     <div className='buttons is-pulled-right'>
