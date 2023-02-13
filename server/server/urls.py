@@ -20,7 +20,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_space__allowed_users__id=self.request.user.id)
+        return queryset.filter(pay_space__expense_users__user__id=self.request.user.id)
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -35,7 +35,7 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_spaces__allowed_users__id=self.request.user.id)
+        return queryset.filter(pay_space__expense_users__user__id=self.request.user.id)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -44,8 +44,7 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request):
         new_user = User.objects.create(username=uuid.uuid4())
         new_pay_space = models.PaySpace.objects.create()
-        new_pay_space.allowed_users.add(new_user)
-        new_pay_space.save()
+        models.ExpenseUser.objects.create(pay_space=new_pay_space, user=new_user)
 
         token = Token.objects.create(user=new_user)
         return response.Response(token.key)
