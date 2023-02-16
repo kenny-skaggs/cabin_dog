@@ -10,6 +10,9 @@ packages = [{include = "cabin_dog"}]
 python = "^3.8"
 django = "^4.1.5"
 djangorestframework = "^3.14.0"
+faker = "^17.0.0"
+python-dotenv = "^0.21.1"
+psycopg2-binary = "^2.9.5"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -2,10 +2,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
-    cache: {
-        type: 'filesystem',
-    },
     entry: path.join(__dirname, 'src', 'main.js'),
     output: {
         filename: 'main.js',

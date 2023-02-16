@@ -63,9 +63,9 @@ export default class CalculateModal extends Component {
                                     <td>{person.name}</td>
                                     <td><CurrencyDisplay amount={person.available_income} /></td>
                                     <td><CurrencyDisplay amount={userPercent[person.id]} /></td>
-                                    <td><CurrencyDisplay amount={userPaid[person.id]} /></td>
+                                    <td><CurrencyDisplay amount={userPaid[person.id] || 0} /></td>
                                     <td><CurrencyDisplay amount={userResponsible[person.id]} /></td>
-                                    <td><CurrencyDisplay amount={userPaid[person.id] - userResponsible[person.id]} /></td>
+                                    <td><CurrencyDisplay amount={userPaid[person.id] || 0 - userResponsible[person.id]} /></td>
                                 </tr>
                             ))}
                             <tr>

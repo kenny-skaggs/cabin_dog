@@ -8,9 +8,8 @@ class PaySpace(models.Model):
     reference = models.UUIDField(default=uuid.uuid4)
 
 
-
 class ExpenseUser(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='expense_user')
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, related_name='expense_users')
 
 

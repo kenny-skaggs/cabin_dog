@@ -1,12 +1,14 @@
-import axios from 'axios';
 import React, {Component} from 'react';
 
 import './app.sass';
 
+import { Network } from './network';
 import Button from './components/Button';
 import CalculateModal from './components/calculationModal';
-import {ExpenseItem, ExpenseList} from './components/expenseListDisplay';
+import {ExpenseList} from './components/expenseListDisplay';
 import {AddNewItemModal} from './components/itemModal';
+
+import auth from './auth';
 
 
 Date.prototype.toDateInputValue = (function() {
@@ -17,34 +19,42 @@ Date.prototype.toDateInputValue = (function() {
 
 
 export class App extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
             expenses: [],
             personList: [],
-            msg: 'loading',
             showingNewItemModal: false,
             showingCalculationModal: false,
             editingItem: this.getNewItemTemplate()
-        }
+        };
+        this.network = new Network();
     }
 
     componentDidMount() {
-        this.setState({msg: 'calling api'});
-        axios.get('/expenses/').then((response) => {
-            this.setState({expenses: response.data});
-            this.setState({msg: 'done loading'});
-        });
-        axios.get('/person/').then((response) => {
-            this.setState({personList: response.data});
-        });
+        this.loadData();
     }
 
+    loadData = () => {
+        if (auth.hasAuthToken()) {
+            this.network.get('/expenses/').then((expenseList) => {
+                this.setState({expenses: expenseList});
+                this.setState({msg: 'done loading'});
+            });
+            this.network.get('/person/').then((personList) => {
+                this.setState({personList: personList});
+            });
+        } else {
+            this.network.register_device(this.loadData);
+        }
+    }
+ 
     getNewItemTemplate = () => ({
         date: new Date().toDateInputValue(),
         amount: '',
         description: '',
-        paid_by: 1,
+        paid_by: this.state != undefined && this.state.personList.length > 0 ? this.state.personList[0].id : 0,
         recurs_monthly: false
     })
 
@@ -72,11 +82,11 @@ export class App extends Component {
     }
 
     _submitNewItem = (item) => {
-        axios.post('/expenses/', item).then((response) => {
+        this.network.post('/expenses/', item).then((expense) => {
             this.setState({
                 expenses: [
                     ...this.state.expenses,
-                    response.data
+                    expense
                 ]
             });
             this.closeNewItemModel();
@@ -85,7 +95,7 @@ export class App extends Component {
 
     _submitEditItem = (item) => {
         const replacedId = item.id;
-        axios.put(`/expenses/${replacedId}/`, item).then(() => {
+        this.network.put(`/expenses/${replacedId}/`, item).then(() => {
             this.setState({
                 expenses: [
                     ...this.state.expenses.filter(possibleMatch => possibleMatch.id != replacedId),
@@ -98,7 +108,7 @@ export class App extends Component {
 
     onDeleteItemClicked = () => {
         const deletedId = this.state.editingItem.id;
-        axios.delete(`/expenses/${deletedId}/`).then(() => {
+        this.network.delete(`/expenses/${deletedId}/`).then(() => {
             this.setState({
                 expenses: this.state.expenses.filter(item => item.id != deletedId)
             });
@@ -134,7 +144,7 @@ export class App extends Component {
         return (
             <div>
                 <div className='top-bar is-clearfix'>
-                    <div className='title is-pulled-left'>Cabin Dog -- {this.state.msg} </div>
+                    <div className='title is-pulled-left'>Cabin Dog</div>
                     <div className='buttons is-pulled-right'>
                         <Button onClick={() => this.setState({showingCalculationModal: true})}>Calculate</Button>
                         <Button onClick={this.onNewItemClicked}>Add New</Button>
@@ -162,10 +172,4 @@ export class App extends Component {
 }
 
 // todo:
-//  login / pay-space
-//  marking items as paid
-//  manage payers
-
-// maybe:
-//  loading spinner
-//  auto-recurring items
+//  intro
