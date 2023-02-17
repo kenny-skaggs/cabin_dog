@@ -1,81 +1,75 @@
 
 from django.test import TestCase
+import pytest
 
-from expenses import models
-from expenses.utils import BalanceCalculator
+from expenses import calculation
 
 
+@pytest.mark.django_db
 class EvenIncomeBalanceTestCase(TestCase):
     def setUp(self):
-        self.person_one = models.Person(id=1, available_income=10)
-        self.person_two = models.Person(id=2, available_income=10)
+        self.person_one = calculation.Person(available_income=10)
+        self.person_two = calculation.Person(available_income=10)
+        self.expense_sharing = calculation.ExpenseSharing(
+            person_one=self.person_one,
+            person_two=self.person_two
+        )
 
     def test_single_charge(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[models.Expense(amount=4, paid_by=self.person_one)]
-        )
+        self.person_one.amount_paid = 4
+
+        balance = self.expense_sharing.get_balance()
         self.assertEqual(self.person_one, balance.payee)
         self.assertEqual(self.person_two, balance.payer)
-        self.assertEqual(balance.amount, 2)
+        self.assertEqual(2, balance.amount)
 
     def test_even_charges(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[
-                models.Expense(amount=5, paid_by=self.person_one),
-                models.Expense(amount=5, paid_by=self.person_two)
-            ]
-        )
-        self.assertEqual(balance.amount, 0)
+        self.person_one.amount_paid = 5
+        self.person_two.amount_paid = 5
+        
+        balance = self.expense_sharing.get_balance()
+        self.assertEqual(0, balance.amount)
 
     def test_complex_charges(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[
-                models.Expense(amount=2, paid_by=self.person_two),
-                models.Expense(amount=7, paid_by=self.person_two),
-                models.Expense(amount=1, paid_by=self.person_one)
-            ]
-        )
-        self.assertEqual(self.person_two, balance.payee)
-        self.assertEqual(self.person_one, balance.payer)
+        self.person_one.amount_paid = 1
+        self.person_two.amount_paid = 9
+
+        balance = self.expense_sharing.get_balance()
+        self.assertEqual(balance.payee, self.person_two)
+        self.assertEqual(balance.payer, self.person_one)
         self.assertEqual(balance.amount, 4)
 
 
+@pytest.mark.django_db
 class UnevenIncomeBalanceTestCase(TestCase):
     def setUp(self):
-        self.person_one = models.Person(id=1, available_income=60)
-        self.person_two = models.Person(id=2, available_income=40)
+        self.person_one = calculation.Person(available_income=60)
+        self.person_two = calculation.Person(available_income=40)
+        self.expense_sharing = calculation.ExpenseSharing(
+            person_one=self.person_one,
+            person_two=self.person_two
+        )
 
     def test_even_charges(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[
-                models.Expense(amount=6, paid_by=self.person_one),
-                models.Expense(amount=4, paid_by=self.person_two)
-            ]
-        )
-        self.assertEqual(balance.amount, 0)
+        self.person_one.amount_paid = 6
+        self.person_two.amount_paid = 4
+        
+        balance = self.expense_sharing.get_balance()
+        self.assertEqual(0, balance.amount)
 
     def test_single_charge(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[models.Expense(amount=10, paid_by=self.person_one)]
-        )
+        self.person_one.amount_paid = 10
+        
+        balance = self.expense_sharing.get_balance()
         self.assertEqual(self.person_one, balance.payee)
         self.assertEqual(self.person_two, balance.payer)
-        self.assertEqual(balance.amount, 4)
+        self.assertEqual(4, balance.amount)
 
     def test_complex_charges(self):
-        balance = BalanceCalculator.calculate_balance(
-            person_list=[self.person_one, self.person_two],
-            expense_list=[
-                models.Expense(amount=2, paid_by=self.person_two),
-                models.Expense(amount=7, paid_by=self.person_two),
-                models.Expense(amount=1, paid_by=self.person_one)
-            ]
-        )
+        self.person_one.amount_paid = 1
+        self.person_two.amount_paid = 9
+        
+        balance = self.expense_sharing.get_balance()
         self.assertEqual(self.person_two, balance.payee)
         self.assertEqual(self.person_one, balance.payer)
-        self.assertEqual(balance.amount, 5)
+        self.assertEqual(5, balance.amount)
