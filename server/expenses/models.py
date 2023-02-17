@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import uuid
 
 from django.contrib.auth.models import User
@@ -29,4 +30,11 @@ class Expense(models.Model):
     paid_by = models.ForeignKey(Person, on_delete=models.CASCADE)
 
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True)
+
+
+@dataclass
+class BalanceData:
+    payer: Person = None
+    payee: Person = None
+    amount: float = 0
     
