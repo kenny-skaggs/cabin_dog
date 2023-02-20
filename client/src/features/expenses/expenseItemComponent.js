@@ -1,5 +1,6 @@
-import {motion, AnimatePresence} from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, {Component, forwardRef} from 'react';
+
 
 class ExpenseItem extends Component {
     onEditClicked = () => {
@@ -43,36 +44,4 @@ class ExpenseItem extends Component {
     }
 }
 
-const ReffedItem = forwardRef((props, ref) => <ExpenseItem forwardedRef={ref} {...props} />);
-
-export class ExpenseList extends Component {
-
-    _compareDates = (a, b) => {
-        if (a.date > b.date) {
-            return -1;
-        } else if (a.date < b.date) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    render() {
-        return (
-            <motion.table className="table is-striped is-fullwidth">
-                <motion.tbody>
-                    <AnimatePresence initial={false} mode='popLayout'>
-                        {this.props.expenseList.sort(this._compareDates).map((expense) => (
-                            <ReffedItem
-                                item={expense}
-                                key={expense.id}
-                                personList={this.props.personList}
-                                onEditItem={this.props.onEditItem}
-                            />
-                        ))}
-                    </AnimatePresence>
-                </motion.tbody>
-            </motion.table>
-        )
-    }
-}
+export default forwardRef((props, ref) => <ExpenseItem forwardedRef={ref} {...props} />);

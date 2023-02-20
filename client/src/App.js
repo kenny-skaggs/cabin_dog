@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 
 import './app.sass';
 
-import { Network } from './network';
+import client from './client';
 import Button from './components/Button';
 import CalculateModal from './components/calculationModal';
-import {ExpenseList} from './components/expenseListDisplay';
+import ExpenseList from './features/expenses/expenseListComponent';
+import { fetchExpenses } from './features/expenses/expensesSlice';
+import { fetchPersons } from './features/persons/personsSlice';
 import {AddNewItemModal} from './components/itemModal';
 
 import auth from './auth';
@@ -18,7 +21,7 @@ Date.prototype.toDateInputValue = (function() {
 });
 
 
-export class App extends Component {
+class App extends Component {
 
     constructor(props) {
         super(props);
@@ -29,7 +32,7 @@ export class App extends Component {
             showingCalculationModal: false,
             editingItem: this.getNewItemTemplate()
         };
-        this.network = new Network();
+        this.network = client;
     }
 
     componentDidMount() {
@@ -38,13 +41,8 @@ export class App extends Component {
 
     loadData = () => {
         if (auth.hasAuthToken()) {
-            this.network.get('/expenses/').then((expenseList) => {
-                this.setState({expenses: expenseList});
-                this.setState({msg: 'done loading'});
-            });
-            this.network.get('/person/').then((personList) => {
-                this.setState({personList: personList});
-            });
+            this.props.fetchExpenses();
+            this.props.fetchPersons();
         } else {
             this.network.register_device(this.loadData);
         }
@@ -129,14 +127,11 @@ export class App extends Component {
 
     render() {
         let expenseListView = '';
-        if (this.state.expenses.length > 0 && this.state.personList.length > 0) {
+        if (this.props.expensesStatus === 'succeeded' && this.props.personsStatus === 'succeeded') {
+            console.log('shaoeu')
             expenseListView = (
                 <div className="container">
-                    <ExpenseList
-                        expenseList={this.state.expenses}
-                        personList={this.state.personList}
-                        onEditItem={this.onEditItemClicked}
-                    />
+                    <ExpenseList onEditItem={this.onEditItemClicked} />
                 </div>
             )
         }
@@ -151,7 +146,7 @@ export class App extends Component {
                     </div>
                 </div>
                 {expenseListView}
-                <AddNewItemModal
+                {/* <AddNewItemModal
                     {...this.state.editingItem}
                     personList={this.state.personList}
                     showModal={this.state.showingNewItemModal}
@@ -159,17 +154,26 @@ export class App extends Component {
                     onSubmit={this.submitItemModel}
                     onDelete={this.onDeleteItemClicked}
                     onCancel={this.closeNewItemModel}
-                />
-                <CalculateModal
+                /> */}
+                {/* <CalculateModal
                     personList={this.state.personList}
                     expenseList={this.state.expenses}
                     showModal={this.state.showingCalculationModal}
                     onCancel={() => this.setState({showingCalculationModal: false})}
-                />
+                /> */}
             </div>
         );
     }
 }
 
-// todo:
-//  intro
+export default connect((state) => {
+    const expensesStatus = state.expenses.status;
+    const personsStatus = state.persons.status;
+    return {
+        expensesStatus,
+        personsStatus
+    };
+}, {
+    fetchExpenses: fetchExpenses,
+    fetchPersons: fetchPersons
+})(App);

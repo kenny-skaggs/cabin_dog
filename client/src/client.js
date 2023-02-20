@@ -3,7 +3,7 @@ import axios from "axios";
 import auth from "./auth";
 import { debouncedCallable } from "./utils";
 
-export class Network {
+export class Client {
     constructor() {
         if (process.env === 'development') {
             axios.defaults.baseURL = 'http://localhost:8000';
@@ -21,15 +21,15 @@ export class Network {
     }
 
     get = (url, data) => {
-        return axios.get(url).then(response => response.data);
+        return axios.get(url).then(response => response);
     }
 
     post = (url, data) => {
-        return axios.post(url, data).then(response => response.data);
+        return axios.post(url, data).then(response => response);
     }
 
     put = (url, data) => {
-        return axios.put(url, data).then(response => response.data);
+        return axios.put(url, data).then(response => response);
     }
 
     delete = (url) => {
@@ -37,6 +37,8 @@ export class Network {
     }
 
     register_device = debouncedCallable((callback) => {
-        this.post('/register/').then(token => auth.setAuthToken(token)).then(callback);
+        this.post('/register/').then(token => auth.setAuthToken(token.data)).then(callback);
     })
-}
+};
+
+export default new Client();

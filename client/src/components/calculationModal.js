@@ -13,9 +13,7 @@ export default class CalculateModal extends Component {
             userPaid[expense.paid_by] = expense.amount + (userPaid[expense.paid_by] || 0);
         });
 
-        const totalIncome = this.props.personList.reduce(
-            (partialSum, person) => partialSum + person.available_income, 0
-        );
+        const totalIncome = 0;
         const userPercent = {};
         const userResponsible = {};
         this.props.personList.forEach(person => {
@@ -73,7 +71,7 @@ export default class CalculateModal extends Component {
                                 <td><CurrencyDisplay amount={totalIncome} /></td>
                                 <td />
                                 <td><CurrencyDisplay amount={totalPaid} /></td>
-                                <td><CurrencyDisplay amount={Object.values(userResponsible).reduce((partialSum, amount) => amount + partialSum, 0)} /></td>
+                                {/* <td><CurrencyDisplay amount={Object.values(userResponsible).reduce((partialSum, amount) => amount + partialSum, 0)} /></td> */}
                             </tr>
                         </tbody>
                     </table>
