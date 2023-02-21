@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from faker import Faker
-from rest_framework import generics, permissions, response, viewsets
+from rest_framework import generics, permissions, response, views, viewsets
 from rest_framework.authtoken.models import Token
 
 from expenses import models, serializers
@@ -14,11 +14,11 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_space__expense_users__user__id=self.request.user.id)
+        return queryset.filter(pay_space__persons__devices__user__id=self.request.user.id)
     
     def create(self, request, *args, **kwargs):
         request.data.update({
-            'pay_space': request.user.expense_user.pay_space.id
+            'pay_space': request.user.device.person.pay_space.id
         })
         return super().create(request, *args, **kwargs)
 
@@ -29,7 +29,7 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_space__expense_users__user__id=self.request.user.id)
+        return queryset.filter(pay_space__persons__devices__user__id=self.request.user.id)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -51,3 +51,9 @@ class RegisterView(generics.CreateAPIView):
 
         token = Token.objects.create(user=new_user)
         return response.Response(token.key)
+
+class CurrentUserView(views.APIView):
+    def get(self, request):
+        return response.Response({
+            'id': request.user.id
+        })

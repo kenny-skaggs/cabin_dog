@@ -7,18 +7,18 @@ from django.db import models
 
 class PaySpace(models.Model):
     reference = models.UUIDField(default=uuid.uuid4)
-
-
-class ExpenseUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='expense_user')
-    pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, related_name='expense_users')
-
+    
 
 class Person(models.Model):
     name = models.CharField(max_length=64)
     available_income = models.FloatField('monthly income to use for calculations')
 
-    pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True)
+    pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True, related_name='persons')
+
+
+class Device(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='device')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='devices')
 
 
 class Expense(models.Model):
