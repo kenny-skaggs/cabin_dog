@@ -24,11 +24,7 @@ class ExpenseList extends Component {
                 <motion.tbody>
                     <AnimatePresence initial={false} mode='popLayout'>
                         {arrayToDisplay.sort(this._compareDates).map((expense) => (
-                            <ExpenseItemComponent
-                                item={expense}
-                                key={expense.id}
-                                onEditItem={this.props.onEditItem}
-                            />
+                            <ExpenseItemComponent item={expense} key={expense.id} />
                         ))}
                     </AnimatePresence>
                 </motion.tbody>

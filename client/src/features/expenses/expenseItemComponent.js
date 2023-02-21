@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion';
-import React, {Component, forwardRef} from 'react';
+import React, { Component, forwardRef } from 'react';
+import { connect } from 'react-redux';
+
+import { edit } from './expensesSlice';
+import { selectPersonById } from '../persons/personsSlice';
 
 
 class ExpenseItem extends Component {
@@ -9,7 +13,7 @@ class ExpenseItem extends Component {
 
     render () {
         let recurranceIcon = '';
-        if (this.props.item.recurs_monthly) {
+        if (this.props.item.recursMonthly) {
             recurranceIcon = (
                 <span className='icon'>
                     <i className='fas fa-repeat' />
@@ -37,11 +41,23 @@ class ExpenseItem extends Component {
                 <td className='date'>{this.props.item.date}</td>
                 <td className='amount'>{this.props.item.amount.toFixed(2)}</td>
                 <td className='description'>{this.props.item.description}</td>
-                <td className='paid-by'>{this.props.personList.find(person => person.id == this.props.item.paid_by).name}</td>
-                <td><span className='is-clickable' onClick={this.onEditClicked}>edit</span></td>
+                <td className='paid-by'>{this.props.person.name}</td>
+                <td><span className='is-clickable' onClick={() => this.props.edit(this.props.item.id)}>edit</span></td>
             </motion.tr>
         );
     }
 }
 
-export default forwardRef((props, ref) => <ExpenseItem forwardedRef={ref} {...props} />);
+export default connect(
+    (state, ownProps) => {
+        const person = selectPersonById(state, ownProps.item.paidBy);
+        return {
+            person
+        };
+    },
+    {
+        edit
+    },
+    null,
+    { forwardRef: true }
+)(ExpenseItem);

@@ -1,55 +1,102 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 
-import Button from './Button';
-import Modal from './modal';
-import store from '../store';
+import Button from '../../components/Button';
+import Modal from '../../components/modal';
+import { closeModal, addExpense, updateExpense } from './expensesSlice';
 
-export class AddNewItemModal extends Component {
+
+Date.prototype.toDateInputValue = (function() {
+    let local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0, 10);
+});
+
+
+export class ItemModal extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = ItemModal._getNewItemTemplate(props);
+    }
 
     onAmountChange = (event) => {
         const newValue = event.target.value;
         const partList = newValue.split('.');
         if (partList.length == 1 || (partList.length == 2 && partList[1].length < 3)) {
-            this.props.onItemPropertyChanged('amount', parseFloat(event.target.value))
+            this.setState({ amount: newValue });
         }
     }
 
     onRecursChange = (event) => {
-        this.props.onItemPropertyChanged('recurs_monthly', event.target.checked);
+        this.setState({ recursMonthly: event.target.checked });
     }
 
     onChange = (fieldName) => (
         (event) => {
-            this.props.onItemPropertyChanged(fieldName, event.target.value);
+            this.setState({ [fieldName]: event.target.value })
         }
     )
 
     onDescriptionChange = (event) => {
-        this.setState({description: event.target.value});
+        this.setState({ description: event.target.value });
     }
 
     onSubmit = () => {
         if (
-            isNaN(parseFloat(this.props.amount))
-            || this.props.date === ''
-            || this.props.description === ''
-            || isNaN(parseInt(this.props.paid_by))
+            isNaN(parseFloat(this.state.amount))
+            || this.state.date === ''
+            || this.state.description === ''
+            || isNaN(parseInt(this.state.paidBy))
         ) {
             return;
         }
 
-        store.dispatch(addExpense(
-            this.state.amount,
-            this.state.paid_by,
-            this.state.date,
-            this.state.description
-        ));
-        this.props.onSubmit();
+        let updateFunction = null;
+        if (this.state.id !== null) {
+            updateFunction = this.props.updateExpense;
+        } else {
+            updateFunction = this.props.addExpense;
+        }
+        
+        updateFunction({
+            id: this.state.id,
+            amount: this.state.amount,
+            paidBy: this.state.paidBy,
+            date: this.state.date,
+            description: this.state.description,
+            recursMonthly: this.state.recursMonthly
+        });
     }
 
     onCancel = (event) => {
         event.preventDefault();
-        this.props.onCancel();
+        this.props.closeModal();
+    }
+
+    static _getNewItemTemplate(props) {
+        return {
+            id: null,
+            date: new Date().toDateInputValue(),
+            amount: '',
+            description: '',
+            paidBy: props.currentUserId,
+            recursMonthly: false
+        };
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.editingItem !== undefined && state.id !== props.editingItem.id) {
+            return props.editingItem;
+        } else if (state.id !== null && props.editingItem === undefined) {
+            return ItemModal._getNewItemTemplate(props);
+        }
+        if (state.paidBy == undefined) {
+            return {
+                paidBy: props.currentUserId
+            }
+        }
+        return null;
     }
 
     render () {
@@ -116,15 +163,11 @@ export class AddNewItemModal extends Component {
                         <div className='control has-icons-left'>
                             <div className='select is-fullwidth'>
                                 <select 
-                                    onChange={this.onChange('paid_by')} 
-                                    value={this.state.paid_by}
+                                    onChange={this.onChange('paidBy')} 
+                                    value={this.state.paidBy}
                                 >
                                     {this.props.personList.map((person) => (
-                                        // todo: default this to current user
-                                        <option
-                                            key={person.id} 
-                                            value={person.id}
-                                        >
+                                        <option key={person.id} value={person.id}>
                                             {person.name}
                                         </option>
                                     ))}
@@ -140,7 +183,7 @@ export class AddNewItemModal extends Component {
                             <label className='checkbox'>
                                 <input type='checkbox'
                                     onChange={this.onRecursChange} 
-                                    checked={this.state.recurs_monthly}
+                                    checked={this.state.recursMonthly}
                                 /> Recurs monthly
                             </label>
                         </div>
@@ -157,3 +200,19 @@ export class AddNewItemModal extends Component {
         )
     }
 }
+
+export default connect(
+    (state) => {
+        return {
+            currentUserId: state.persons.currentUserId,
+            showModal: state.expenses.showModal,
+            editingItem: state.expenses.list.find(expense => expense.id === state.expenses.editItemId),
+            personList: state.persons.list
+        };
+    },
+    {
+        closeModal,
+        addExpense,
+        updateExpense
+    }
+)(ItemModal);
