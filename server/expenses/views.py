@@ -1,11 +1,13 @@
+from collections import defaultdict
 import uuid
+from typing import List
 
 from django.contrib.auth.models import User
 from faker import Faker
 from rest_framework import generics, permissions, response, views, viewsets
 from rest_framework.authtoken.models import Token
 
-from expenses import models, serializers
+from expenses import calculation, models, serializers
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -14,7 +16,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_space__persons__devices__user__id=self.request.user.id)
+        return queryset.for_user(self.request.user.id)
     
     def create(self, request, *args, **kwargs):
         request.data.update({
@@ -29,7 +31,7 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(pay_space__persons__devices__user__id=self.request.user.id)
+        return queryset.for_user(self.request.user.id)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -56,4 +58,28 @@ class CurrentUserView(views.APIView):
     def get(self, request):
         return response.Response({
             'id': request.user.id
+        })
+
+class CalculationView(views.APIView):
+    def get(self, request):
+        person_list: List[models.Person] = models.Person.objects.for_user(self.request.user.id).all()
+        expenses = models.Expense.objects.for_user(self.request.user.id).all()
+
+        person_map = {
+            person.id: calculation.Person(
+                available_income=person.available_income,
+                id_=person.id
+            )
+            for person in person_list
+        }
+        for expense in expenses:
+            person_map[expense.paid_by.id].amount_paid += expense.amount
+
+        # assuming just two people for now
+        shared_expense = calculation.ExpenseSharing(*person_map.values())
+        balance = shared_expense.get_balance()
+        return response.Response({
+            'payee_id': balance.payee.id,
+            'payer_id': balance.payer.id,
+            'amount': balance.amount
         })

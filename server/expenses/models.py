@@ -5,6 +5,16 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class ExpenseQuerySet(models.query.QuerySet):
+    def for_user(self, user_id):
+        return self.filter(pay_space__persons__devices__user__id=user_id)
+
+
+class PersonQuerySet(models.query.QuerySet):
+    def for_user(self, user_id):
+        return self.filter(pay_space__persons__devices__user__id=user_id)
+
+
 class PaySpace(models.Model):
     reference = models.UUIDField(default=uuid.uuid4)
     
@@ -12,8 +22,9 @@ class PaySpace(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=64)
     available_income = models.FloatField('monthly income to use for calculations')
-
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True, related_name='persons')
+
+    objects = PersonQuerySet.as_manager()
 
 
 class Device(models.Model):
@@ -28,8 +39,9 @@ class Expense(models.Model):
     recurs_monthly = models.BooleanField()
     # todo: add calc category functionality (how much the cost should be shared)
     paid_by = models.ForeignKey(Person, on_delete=models.CASCADE)
-
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True)
+
+    objects = ExpenseQuerySet.as_manager()
 
 
 @dataclass

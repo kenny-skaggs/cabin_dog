@@ -6,9 +6,11 @@ import './app.sass';
 import Button from './components/Button';
 import CalculationSummary from './features/calculation/calculationSummary';
 import ExpenseList from './features/expenses/expenseListComponent';
+import ItemModal from './features/expenses/itemModal';
+
+import { fetchCalculation } from './features/calculation/calculationSlice';
 import { fetchExpenses, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
-import ItemModal from './features/expenses/itemModal';
 
 import auth from './auth';
 
@@ -24,6 +26,7 @@ class App extends Component {
             this.props.fetchExpenses();
             this.props.fetchPersons();
             this.props.fetchCurrentUser();
+            this.props.fetchCalculation();
         } else {
             this.network.register_device(this.loadData);
         }
@@ -69,11 +72,8 @@ class App extends Component {
                         </div>
                     </div>
                     <div className='navbar-end'>
-                        <div className='navbar-item'>
-                            <CalculationSummary />
-                        </div>
                         <div className='buttons navbar-item'>
-                            <Button onClick={() => this.setState({showingCalculationModal: true})}>Calculate</Button>
+                            <CalculationSummary />
                             <Button onClick={() => this.props.createNew()}>Add New</Button>
                         </div>
                     </div>
@@ -99,6 +99,7 @@ export default connect((state) => {
     };
 }, {
     createNew,
+    fetchCalculation,
     fetchCurrentUser,
     fetchExpenses,
     fetchPersons,

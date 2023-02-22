@@ -1,11 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 
+from expenses.models import Expense
+
 
 class Person:
-    def __init__(self, available_income: float, amount_paid: float = 0):
+    def __init__(self, available_income: float, id_: int, amount_paid: float = 0):
         self.available_income = available_income
         self.amount_paid = amount_paid
+        self.id = id_
 
 
 @dataclass
