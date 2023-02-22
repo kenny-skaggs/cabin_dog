@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 
 import './app.sass';
 
-import client from './client';
 import Button from './components/Button';
-import CalculateModal from './components/calculationModal';
+import CalculationSummary from './features/calculation/calculationSummary';
 import ExpenseList from './features/expenses/expenseListComponent';
 import { fetchExpenses, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
@@ -63,21 +62,24 @@ class App extends Component {
 
         return (
             <div>
-                <div className='top-bar is-clearfix'>
-                    <div className='title is-pulled-left'>Cabin Dog</div>
-                    <div className='buttons is-pulled-right'>
-                        <Button onClick={() => this.setState({showingCalculationModal: true})}>Calculate</Button>
-                        <Button onClick={() => this.props.createNew()}>Add New</Button>
+                <div className='navbar'>
+                    <div className='navbar-brand'>
+                        <div className='navbar-item'>
+                            <h1 className='title'>Cabin Dog</h1>
+                        </div>
+                    </div>
+                    <div className='navbar-end'>
+                        <div className='navbar-item'>
+                            <CalculationSummary />
+                        </div>
+                        <div className='buttons navbar-item'>
+                            <Button onClick={() => this.setState({showingCalculationModal: true})}>Calculate</Button>
+                            <Button onClick={() => this.props.createNew()}>Add New</Button>
+                        </div>
                     </div>
                 </div>
                 {expenseListView}
                 <ItemModal />
-                {/* <CalculateModal
-                    personList={this.state.personList}
-                    expenseList={this.state.expenses}
-                    showModal={this.state.showingCalculationModal}
-                    onCancel={() => this.setState({showingCalculationModal: false})}
-                /> */}
             </div>
         );
     }
