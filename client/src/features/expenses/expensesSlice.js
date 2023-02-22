@@ -67,11 +67,12 @@ export const expenseSlice = createSlice({
                     ...state.list.filter(expense => expense.id !== action.payload.id),
                     action.payload
                 ]
+                state.editItemId = null;
                 state.showModal = false;
             });
     }
 });
 
-export const { remove, createNew, edit, closeModal } = expenseSlice.actions;
+export const { createNew, edit, closeModal } = expenseSlice.actions;
 
 export default expenseSlice.reducer;

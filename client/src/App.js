@@ -53,7 +53,7 @@ class App extends Component {
 
     render() {
         let expenseListView = '';
-        if (this.props.expensesStatus === 'succeeded' && this.props.personsStatus === 'succeeded') {
+        if (this.props.hasData) {
             expenseListView = (
                 <div className="container">
                     <ExpenseList />
@@ -86,9 +86,14 @@ class App extends Component {
 export default connect((state) => {
     const expensesStatus = state.expenses.status;
     const personsStatus = state.persons.status;
+    const hasData = (
+        state.expenses.list.length > 0
+        && state.persons.list.length > 0
+    )
     return {
         expensesStatus,
-        personsStatus
+        personsStatus,
+        hasData
     };
 }, {
     createNew,

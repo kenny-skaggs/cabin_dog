@@ -58,7 +58,6 @@ export class ItemModal extends Component {
         } else {
             updateFunction = this.props.addExpense;
         }
-        
         updateFunction({
             id: this.state.id,
             amount: this.state.amount,

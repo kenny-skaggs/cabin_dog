@@ -20,7 +20,7 @@ class ExpenseItem extends Component {
                 </span>
             )
         }
-
+        
         return (
             <motion.tr
                 layout
@@ -48,7 +48,7 @@ class ExpenseItem extends Component {
     }
 }
 
-export default connect(
+const ConnectedComponent = connect(
     (state, ownProps) => {
         const person = selectPersonById(state, ownProps.item.paidBy);
         return {
@@ -57,7 +57,7 @@ export default connect(
     },
     {
         edit
-    },
-    null,
-    { forwardRef: true }
+    }
 )(ExpenseItem);
+
+export default forwardRef((props, ref) => <ConnectedComponent {...props} forwardedRef={ref} />);
