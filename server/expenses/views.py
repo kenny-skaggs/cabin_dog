@@ -1,6 +1,7 @@
 from collections import defaultdict
-import uuid
+from datetime import datetime
 from typing import List
+import uuid
 
 from django.contrib.auth.models import User
 from faker import Faker
@@ -13,6 +14,8 @@ from expenses import calculation, models, serializers
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = models.Expense.objects.all()
     serializer_class = serializers.ExpenseSerializer
+
+    # todo: set up paging
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -62,24 +65,39 @@ class CurrentUserView(views.APIView):
 
 class CalculationView(views.APIView):
     def get(self, request):
-        person_list: List[models.Person] = models.Person.objects.for_user(self.request.user.id).all()
-        expenses = models.Expense.objects.for_user(self.request.user.id).all()
-
-        person_map = {
-            person.id: calculation.Person(
-                available_income=person.available_income,
-                id_=person.id
-            )
-            for person in person_list
-        }
-        for expense in expenses:
-            person_map[expense.paid_by.id].amount_paid += expense.amount
-
-        # assuming just two people for now
-        shared_expense = calculation.ExpenseSharing(*person_map.values())
-        balance = shared_expense.get_balance()
+        balance, _ = calculation.ExpenseSharing.retrieve_for_household(
+            household_id=request.user.device.person.pay_space.id
+        )
         return response.Response({
-            'payee_id': balance.payee.id,
-            'payer_id': balance.payer.id,
-            'amount': balance.amount
+            'payee': {
+                'id': balance.payee.id,
+                'paid': balance.payee.amount_paid
+            },
+            'payer': {
+                'id': balance.payer.id,
+                'paid': balance.payer.amount_paid
+            },
+            'balancing_payment': balance.amount
         })
+
+
+class PaymentView(views.APIView):
+    def post(self, request):
+        balance, expense_list = calculation.ExpenseSharing.retrieve_for_household(
+            household_id=request.user.device.person.pay_space.id
+        )
+
+        if balance.amount == request.data['amount']:
+            payment = models.Payment(
+                amount=balance.amount,
+                timestamp=datetime.utcnow(),
+                payer_id=balance.payer.id,
+                payee_id=balance.payee.id
+            )
+            payment.save()
+            payment.expense_list.set(expense_list)
+            payment.save()
+
+            return response.Response('success')
+        else:
+            return response.Response('mismatch', status=409)

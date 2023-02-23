@@ -34,7 +34,7 @@ class ExpenseItem extends Component {
                 exit={{
                     opacity: 0
                 }} 
-                className='expense-item'
+                className={`expense-item ${this.props.item.payment ? 'settled' : ''}`}
                 ref={this.props.forwardedRef}
             >
                 <td className='recurrence'>{recurranceIcon}</td>

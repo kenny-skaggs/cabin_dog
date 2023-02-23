@@ -11,11 +11,11 @@ class CalculationSummary extends Component {
         }
 
         return (
-            <Button>
-                <span>{this.props.payer.name} should send</span>&nbsp;
+            <span>
+                {this.props.payer.name} should send&nbsp;
                 $<CurrencyDisplay amount={this.props.amount} />&nbsp;
-                <span>to {this.props.payee.name}</span>
-            </Button>
+                to {this.props.payee.name}
+            </span>
         );
     }
 }
@@ -27,9 +27,9 @@ export default connect(
         }
 
         return {
-            amount: state.calculation.amount,
-            payer: state.persons.list.find(person => person.id === state.calculation.payerId),
-            payee: state.persons.list.find(person => person.id === state.calculation.payeeId)
+            amount: state.calculation.balancingPayment,
+            payer: state.persons.list.find(person => person.id === state.calculation.payer.id),
+            payee: state.persons.list.find(person => person.id === state.calculation.payee.id)
         }
     }
 )(CalculationSummary);

@@ -5,10 +5,11 @@ import './app.sass';
 
 import Button from './components/Button';
 import CalculationSummary from './features/calculation/calculationSummary';
+import CalculationDetails from './features/calculation/calculationDetails';
 import ExpenseList from './features/expenses/expenseListComponent';
 import ItemModal from './features/expenses/itemModal';
 
-import { fetchCalculation } from './features/calculation/calculationSlice';
+import { fetchCalculation, showCalculationModal } from './features/calculation/calculationSlice';
 import { fetchExpenses, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
 
@@ -42,25 +43,9 @@ class App extends Component {
         });
     }
 
-    closeNewItemModel = () => {
-        this.setState({showingNewItemModal: false});
-    }
-
-    onItemPropertyChanged = (name, newValue) => {
-        this.setState({editingItem: {
-            ...this.state.editingItem,
-            [name]: newValue
-        }});
-    }
-
     render() {
-        let expenseListView = '';
-        if (this.props.hasData) {
-            expenseListView = (
-                <div className="container">
-                    <ExpenseList />
-                </div>
-            )
+        if (!this.props.hasData) {
+            return null;
         }
 
         return (
@@ -73,13 +58,18 @@ class App extends Component {
                     </div>
                     <div className='navbar-end'>
                         <div className='buttons navbar-item'>
-                            <CalculationSummary />
+                            <Button onClick={() => this.props.showCalculationModal()}>
+                                <CalculationSummary />
+                            </Button>
                             <Button onClick={() => this.props.createNew()}>Add New</Button>
                         </div>
                     </div>
                 </div>
-                {expenseListView}
+                <div className="container">
+                    <ExpenseList />
+                </div>
                 <ItemModal />
+                <CalculationDetails />
             </div>
         );
     }
@@ -91,6 +81,7 @@ export default connect((state) => {
     const hasData = (
         state.expenses.list.length > 0
         && state.persons.list.length > 0
+        && state.calculation.payee.id !== null
     )
     return {
         expensesStatus,
@@ -103,4 +94,5 @@ export default connect((state) => {
     fetchCurrentUser,
     fetchExpenses,
     fetchPersons,
+    showCalculationModal
 })(App);

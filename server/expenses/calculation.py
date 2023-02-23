@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
-from expenses.models import Expense
+from expenses import models
 
 
 class Person:
@@ -22,6 +22,28 @@ class ExpenseSharing:
     def __init__(self, person_one: Person, person_two: Person):
         self._person_one = person_one
         self._person_two = person_two
+
+    @classmethod
+    def retrieve_for_household(cls, household_id) -> Tuple['ExpenseSharing', List[models.Expense]]:
+        # todo: set up way to cache this in redis
+
+        person_list: List[models.Person] = models.Person.objects.for_household(household_id).all()
+        expenses = models.Expense.objects.for_household(household_id).unsettled().all()
+
+        person_map = {
+            person.id: Person(
+                available_income=person.available_income,
+                id_=person.id
+            )
+            for person in person_list
+        }
+        for expense in expenses:
+            person_map[expense.paid_by.id].amount_paid += expense.amount
+
+        # assuming just two people for now
+        shared_expense = ExpenseSharing(*person_map.values())
+        return shared_expense.get_balance(), expenses
+        
 
     def get_balance(self) -> Balancer:
         total_amount_paid = self._person_one.amount_paid + self._person_two.amount_paid
