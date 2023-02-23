@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from faker import Faker
 from rest_framework import generics, permissions, response, views, viewsets
 from rest_framework.authtoken.models import Token
+from rest_framework.pagination import LimitOffsetPagination
 
 from expenses import calculation, models, serializers
 
@@ -14,12 +15,11 @@ from expenses import calculation, models, serializers
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = models.Expense.objects.all()
     serializer_class = serializers.ExpenseSerializer
-
-    # todo: set up paging
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.for_user(self.request.user.id)
+        return queryset.for_user(self.request.user.id).order_by('-date')
     
     def create(self, request, *args, **kwargs):
         request.data.update({
@@ -60,7 +60,7 @@ class RegisterView(generics.CreateAPIView):
 class CurrentUserView(views.APIView):
     def get(self, request):
         return response.Response({
-            'id': request.user.id
+            'id': request.user.device.person.id
         })
 
 class CalculationView(views.APIView):

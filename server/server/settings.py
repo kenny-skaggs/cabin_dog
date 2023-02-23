@@ -155,5 +155,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-    )
+    ),
+    'PAGE_SIZE': 20
 }

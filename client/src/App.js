@@ -10,7 +10,7 @@ import ExpenseList from './features/expenses/expenseListComponent';
 import ItemModal from './features/expenses/itemModal';
 
 import { fetchCalculation, showCalculationModal } from './features/calculation/calculationSlice';
-import { fetchExpenses, createNew } from './features/expenses/expensesSlice';
+import { fetchExpenses, fetchNextExpensePage, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
 
 import auth from './auth';
@@ -67,6 +67,12 @@ class App extends Component {
                 </div>
                 <div className="container">
                     <ExpenseList />
+                    <Button
+                        onClick={() => this.props.fetchNextExpensePage()}
+                        disabled={!this.props.canLoadMoreExpenses}
+                    >
+                        Load more
+                    </Button>
                 </div>
                 <ItemModal />
                 <CalculationDetails />
@@ -82,17 +88,19 @@ export default connect((state) => {
         state.expenses.list.length > 0
         && state.persons.list.length > 0
         && state.calculation.payee.id !== null
-    )
+    );
     return {
         expensesStatus,
         personsStatus,
-        hasData
+        hasData,
+        canLoadMoreExpenses: state.expenses.canLoadMoreExpenses
     };
 }, {
     createNew,
     fetchCalculation,
     fetchCurrentUser,
     fetchExpenses,
+    fetchNextExpensePage,
     fetchPersons,
     showCalculationModal
 })(App);

@@ -6,11 +6,19 @@ const initialState = {
     status: 'idle',
     error: null,
     showModal: false,
-    editItemId: null
+    editItemId: null,
+    canLoadMoreExpenses: true
 }
+
+let nextExpenseUrl = null;
 
 export const fetchExpenses = createAsyncThunk('expenses/fetchExpenses', async () => {
     const response = await client.get('/expenses/');
+    return response.data;
+});
+
+export const fetchNextExpensePage = createAsyncThunk('expenses/fetchNextExpensePage', async () => {
+    const response = await client.get(nextExpenseUrl);
     return response.data;
 });
 
@@ -47,7 +55,17 @@ export const expenseSlice = createSlice({
             })
             .addCase(fetchExpenses.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.list = action.payload;
+                state.list = action.payload.results;
+                nextExpenseUrl = action.payload.next;
+                state.canLoadMoreExpenses = action.payload.next !== null;
+            })
+            .addCase(fetchNextExpensePage.fulfilled, (state, action) => {
+                nextExpenseUrl = action.payload.next;
+                return {
+                    ...state,
+                    list: state.list.concat(action.payload.results),
+                    canLoadMoreExpenses: action.payload.next !== null
+                }
             })
             .addCase(addExpense.pending, (state) => {
                 state.status = 'loading';
