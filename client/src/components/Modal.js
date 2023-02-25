@@ -7,15 +7,10 @@ export default class Modal extends Component {
             <motion.div
                 initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}
                 transition={{duration: 0.1}}
-                className='modal is-active'
+                className={`modal is-active ${this.props.className }`}
             >
                 <div className='modal-background'></div>
-                <motion.div
-                    className='modal-content box'
-                    initial={{scale: 0.8}} animate={{scale: 1}} exit={{scale: 0.8}}
-                >
-                    {this.props.children}
-                </motion.div>
+                {this.props.children}
             </motion.div>
         );
         return (

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Button from '../../components/Button';
 import CalculationSummary from './calculationSummary';
 import CurrencyDisplay from '../../components/currencyDisplay';
-import Modal from '../../components/modal';
+import Modal from '../../components/ContentModal';
 
 import { closeCalculationModal, postPayment } from './calculationSlice';
 

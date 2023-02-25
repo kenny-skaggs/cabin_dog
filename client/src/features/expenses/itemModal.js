@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 
 import Button from '../../components/Button';
-import Modal from '../../components/modal';
+import Modal from '../../components/ContentModal';
 import { closeModal, addExpense, updateExpense } from './expensesSlice';
 
 

@@ -8,6 +8,8 @@ import CalculationSummary from './features/calculation/calculationSummary';
 import CalculationDetails from './features/calculation/calculationDetails';
 import ExpenseList from './features/expenses/expenseListComponent';
 import ItemModal from './features/expenses/itemModal';
+import LoadingAnimation from './components/LoadingAnimation';
+import LoadingModal from './components/LoadingModal';
 
 import { fetchCalculation, showCalculationModal } from './features/calculation/calculationSlice';
 import { fetchExpenses, fetchNextExpensePage, createNew } from './features/expenses/expensesSlice';
@@ -44,8 +46,34 @@ class App extends Component {
     }
 
     render() {
-        if (!this.props.hasData) {
-            return null;
+        let contentDisplay = '';
+        let summaryDisplay = '';
+        let nextPageControl = '';
+        if (this.props.hasData) {
+            if (this.props.isNewPageLoading) {
+                nextPageControl = <LoadingAnimation />
+            } else {
+                nextPageControl = (
+                    <Button
+                        onClick={() => this.props.fetchNextExpensePage()}
+                        disabled={!this.props.canLoadMoreExpenses}
+                    >
+                        Load more
+                    </Button>
+                )
+            }
+
+            summaryDisplay = (
+                <Button onClick={() => this.props.showCalculationModal()}>
+                    <CalculationSummary />
+                </Button>
+            );
+            contentDisplay = (
+                <div>
+                    <ExpenseList />
+                    { nextPageControl }
+                </div>
+            );
         }
 
         return (
@@ -58,24 +86,17 @@ class App extends Component {
                     </div>
                     <div className='navbar-end'>
                         <div className='buttons navbar-item'>
-                            <Button onClick={() => this.props.showCalculationModal()}>
-                                <CalculationSummary />
-                            </Button>
+                            {summaryDisplay}
                             <Button onClick={() => this.props.createNew()}>Add New</Button>
                         </div>
                     </div>
                 </div>
                 <div className="container">
-                    <ExpenseList />
-                    <Button
-                        onClick={() => this.props.fetchNextExpensePage()}
-                        disabled={!this.props.canLoadMoreExpenses}
-                    >
-                        Load more
-                    </Button>
+                    {contentDisplay}
                 </div>
                 <ItemModal />
                 <CalculationDetails />
+                <LoadingModal />
             </div>
         );
     }
@@ -91,6 +112,7 @@ export default connect((state) => {
     );
     return {
         expensesStatus,
+        isNewPageLoading: state.expenses.paginationStatus === 'loading',
         personsStatus,
         hasData,
         canLoadMoreExpenses: state.expenses.canLoadMoreExpenses

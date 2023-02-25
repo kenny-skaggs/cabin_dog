@@ -4,6 +4,7 @@ import client from "../../client";
 const initialState = {
     list: [],
     status: 'idle',
+    paginationStatus: 'idle',
     error: null,
     showModal: false,
     editItemId: null,
@@ -50,7 +51,7 @@ export const expenseSlice = createSlice({
     },
     extraReducers(builder) {
         builder
-            .addCase(fetchExpenses.pending, (state, action) => {
+            .addCase(fetchExpenses.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(fetchExpenses.fulfilled, (state, action) => {
@@ -59,10 +60,14 @@ export const expenseSlice = createSlice({
                 nextExpenseUrl = action.payload.next;
                 state.canLoadMoreExpenses = action.payload.next !== null;
             })
+            .addCase(fetchNextExpensePage.pending, (state) => {
+                state.paginationStatus = 'loading';
+            })
             .addCase(fetchNextExpensePage.fulfilled, (state, action) => {
                 nextExpenseUrl = action.payload.next;
                 return {
                     ...state,
+                    paginationStatus: 'succeeded',
                     list: state.list.concat(action.payload.results),
                     canLoadMoreExpenses: action.payload.next !== null
                 }
