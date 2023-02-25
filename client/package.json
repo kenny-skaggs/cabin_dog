@@ -13,6 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.2",
+    "@visx/group": "^3.0.0",
+    "@visx/scale": "^3.0.0",
+    "@visx/shape": "^3.0.0",
     "axios": "^1.2.3",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
