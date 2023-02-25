@@ -20,6 +20,15 @@ class ExpenseItem extends Component {
                 </span>
             )
         }
+
+        let editControl = '';
+        if (!this.props.item.payment) {
+            editControl = (
+                <span className='is-clickable' onClick={() => this.props.edit(this.props.item.id)}>
+                    edit
+                </span>
+            )
+        }
         
         return (
             <motion.tr
@@ -42,7 +51,7 @@ class ExpenseItem extends Component {
                 <td className='amount'>{this.props.item.amount.toFixed(2)}</td>
                 <td className='description'>{this.props.item.description}</td>
                 <td className='paid-by'>{this.props.person.name}</td>
-                <td><span className='is-clickable' onClick={() => this.props.edit(this.props.item.id)}>edit</span></td>
+                <td>{ editControl }</td>
             </motion.tr>
         );
     }
