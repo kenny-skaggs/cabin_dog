@@ -38,7 +38,7 @@ export class Client {
 
     register_device = debouncedCallable((callback) => {
         this.post('/register/').then(token => auth.setAuthToken(token.data)).then(callback);
-    })
+    });
 };
 
 export default new Client();

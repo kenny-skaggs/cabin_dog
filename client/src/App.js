@@ -15,6 +15,8 @@ import { fetchCalculation, showCalculationModal } from './features/calculation/c
 import { fetchExpenses, fetchNextExpensePage, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
 
+import client from './client';
+
 import auth from './auth';
 
 
@@ -31,7 +33,7 @@ class App extends Component {
             this.props.fetchCurrentUser();
             this.props.fetchCalculation();
         } else {
-            this.network.register_device(this.loadData);
+            client.register_device(this.loadData);
         }
     }
 
