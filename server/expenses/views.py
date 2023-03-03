@@ -6,10 +6,9 @@ import uuid
 from django.contrib.auth.models import User
 from faker import Faker
 from rest_framework import generics, permissions, response, views, viewsets
-from rest_framework.authtoken.models import Token
 from rest_framework.pagination import LimitOffsetPagination
 
-from expenses import calculation, models, serializers
+from expenses import auth, calculation, models, serializers
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -53,7 +52,7 @@ class RegisterView(generics.CreateAPIView):
             user=new_user
         )
 
-        token = Token.objects.create(user=new_user)
+        token = auth.MultiToken.objects.create(user=new_user)
         return response.Response(token.key)
 
 class CurrentUserView(views.APIView):
