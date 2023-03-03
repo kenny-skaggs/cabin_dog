@@ -23,7 +23,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         request.data.update({
-            'pay_space': request.user.device.person.pay_space.id
+            'pay_space': request.user.person.pay_space.id
         })
         return super().create(request, *args, **kwargs)
 
@@ -45,14 +45,13 @@ class RegisterView(generics.CreateAPIView):
 
         new_user = User.objects.create(username=uuid.uuid4())
         new_pay_space = models.PaySpace.objects.create()
-        models.ExpenseUser.objects.create(pay_space=new_pay_space, user=new_user)
 
-        for _ in range(2):
-            models.Person.objects.create(
-                name=fake.first_name(),
-                available_income=fake.pyint(min_value=2000, max_value=6000),
-                pay_space=new_pay_space
-            )
+        models.Person.objects.create(
+            name=fake.first_name(),
+            available_income=fake.pyint(min_value=2000, max_value=6000),
+            pay_space=new_pay_space,
+            user=new_user
+        )
 
         token = Token.objects.create(user=new_user)
         return response.Response(token.key)
@@ -60,13 +59,13 @@ class RegisterView(generics.CreateAPIView):
 class CurrentUserView(views.APIView):
     def get(self, request):
         return response.Response({
-            'id': request.user.device.person.id
+            'id': request.user.person.id
         })
 
 class CalculationView(views.APIView):
     def get(self, request):
         balance, _ = calculation.ExpenseSharing.retrieve_for_household(
-            household_id=request.user.device.person.pay_space.id
+            household_id=request.user.person.pay_space.id
         )
         return response.Response({
             'payee': {
@@ -84,7 +83,7 @@ class CalculationView(views.APIView):
 class PaymentView(views.APIView):
     def post(self, request):
         balance, expense_list = calculation.ExpenseSharing.retrieve_for_household(
-            household_id=request.user.device.person.pay_space.id
+            household_id=request.user.person.pay_space.id
         )
 
         if balance.amount == request.data['amount']:

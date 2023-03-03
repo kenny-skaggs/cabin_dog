@@ -7,7 +7,7 @@ from django.db import models
 
 class ExpenseQuerySet(models.query.QuerySet):
     def for_user(self, user_id):
-        return self.filter(pay_space__persons__devices__user__id=user_id)
+        return self.filter(pay_space__persons__user__id=user_id)
 
     def for_household(self, household_id):
         return self.filter(pay_space__id=household_id)
@@ -18,7 +18,7 @@ class ExpenseQuerySet(models.query.QuerySet):
 
 class PersonQuerySet(models.query.QuerySet):
     def for_user(self, user_id):
-        return self.filter(pay_space__persons__devices__user__id=user_id)
+        return self.filter(pay_space__persons__user__id=user_id)
 
     def for_household(self, household_id):
         return self.filter(pay_space__id=household_id)
@@ -32,13 +32,9 @@ class Person(models.Model):
     name = models.CharField(max_length=64)
     available_income = models.FloatField('monthly income to use for calculations')
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True, related_name='persons')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='person', null=True)
 
     objects = PersonQuerySet.as_manager()
-
-
-class Device(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='device')
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='devices')
 
 
 class Payment(models.Model):
