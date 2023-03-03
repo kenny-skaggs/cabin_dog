@@ -27,61 +27,8 @@ class CalculationDetails extends Component {
             }
         });
 
-        console.log(personData);
-        
-        // Define the graph dimensions and margins
-        const width = 500;
-        const height = 100;
-        const margin = { top: 20, bottom: 20, left: 20, right: 20 };
-        
-        // Then we'll create some bounds
-        const xMax = width - margin.left - margin.right;
-        const yMax = height - margin.top - margin.bottom;
-        
-        // We'll make some helpers to get at the data we want
-        const x = d => d.paid;
-        const y = d => d.id;
-        
-        // And then scale the graph by our data
-        const xScale = scaleLinear({
-            range: [0, xMax],
-            round: true,
-            domain: [0, this.props.totalPaid],
-          });
-        const yScale = scaleBand({
-          range: [0, yMax],
-          round: true,
-          domain: personData.map(y)
-        });
-        const colorScale = scaleOrdinal({
-            domain: personData.map(y),
-            range: ['blue', 'green']
-        });
-        
-        // Compose together the scale and accessor functions to get point functions
-        const compose = (scale, accessor) => personData => scale(accessor(personData));
-        const xPoint = compose(xScale, x);
-        const yPoint = compose(yScale, y);
-
         return (
             <Modal showModal={this.props.showModal}>
-                <svg width={width} height={height}>
-                    {personData.map((d, i) => {
-                        const barWidth = xMax - xPoint(d);
-                        return (
-                            <Group key={`bar-${i}`}>
-                                <Bar
-                                    x={0}
-                                    y={yPoint(d)}
-                                    height={yScale.bandwidth()}
-                                    width={barWidth}
-                                    fill={colorScale(d.id)}
-                                />
-                            </Group>
-                        );
-                    })}
-                    </svg>
-
                 <div className='calculation-view'>
                     <table className='table is-bordered is-fullwidth'>
                         <thead>
