@@ -62,7 +62,8 @@ class AddDeviceView(views.APIView):
         Generate and return new device token for authenticated user.
         User will then use authenticated device to activate new device.
         """
-        return response.Response()
+        new_token = auth.MultiToken.objects.create(user=request.user)
+        return response.Response(new_token.key)
 
 
 class AddPersonView(views.APIView):

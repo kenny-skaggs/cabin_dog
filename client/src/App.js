@@ -17,9 +17,18 @@ import { fetchExpenses, fetchNextExpensePage, createNew } from './features/expen
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
 
 import auth from './auth';
+import RegistrationLinkView from './features/persons/registrationLinkView';
+import client from './client';
 
 
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            registrationLink: null
+        };
+    }
 
     componentDidMount() {
         this.loadData();
@@ -48,6 +57,22 @@ class App extends Component {
             });
             this.closeNewItemModel();
         });
+    }
+
+    onAddPerson = () => {
+        client.post('/add/person/').then((response) => {
+            this.setState({ registrationLink: { personToken: response.data } });
+        });
+    }
+
+    onAddDevice = () => {
+        client.post('/add/device/').then((response) => {
+            this.setState({ registrationLink: { deviceToken: response.data } });
+        });
+    }
+
+    onRegistrationDone = () => {
+        this.setState({ registrationLink: null });
     }
 
     render() {
@@ -83,6 +108,13 @@ class App extends Component {
         }
         if (!auth.hasAuthToken()) {
             registrationView = <RegistrationView />;
+        } else if (this.state.registrationLink) {
+            registrationView = (
+                <RegistrationLinkView 
+                    {...this.state.registrationLink} 
+                    onDone={this.onRegistrationDone} 
+                />
+            );
         }
 
         return (
@@ -97,22 +129,15 @@ class App extends Component {
 
                         <div className="navbar-item has-dropdown is-hoverable">
                             <a className="navbar-link">
-                                More
+                                Setup
                             </a>
 
                             <div className="navbar-dropdown">
-                                <a className="navbar-item">
-                                    About
+                                <a className="navbar-item" onClick={this.onAddPerson}>
+                                    Add Person
                                 </a>
-                                <a className="navbar-item">
-                                    Jobs
-                                </a>
-                                <a className="navbar-item">
-                                    Contact
-                                </a>
-                                <hr className="navbar-divider"></hr>
-                                <a className="navbar-item">
-                                    Report an issue
+                                <a className="navbar-item" onClick={this.onAddDevice}>
+                                    Add Device
                                 </a>
                             </div>
                         </div>
