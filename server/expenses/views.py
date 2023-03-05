@@ -54,6 +54,25 @@ class RegisterView(generics.CreateAPIView):
 
         token = auth.MultiToken.objects.create(user=new_user)
         return response.Response(token.key)
+    
+
+class AddDeviceView(views.APIView):
+    def post(self, request):
+        """
+        Generate and return new device token for authenticated user.
+        User will then use authenticated device to activate new device.
+        """
+        return response.Response()
+
+
+class AddPersonView(views.APIView):
+    def post(self, request, household_ref):
+        """
+        Generate new person and device token for authenticated user's household.
+        User will then current device to activate new user's device.
+        """
+        return response.Response()
+
 
 class CurrentUserView(views.APIView):
     def get(self, request):

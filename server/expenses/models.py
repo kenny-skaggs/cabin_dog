@@ -30,6 +30,7 @@ class PaySpace(models.Model):
 
 class Person(models.Model):
     name = models.CharField(max_length=64)
+    reference = models.UUIDField(default=uuid.uuid4)
     available_income = models.FloatField('monthly income to use for calculations')
     pay_space = models.ForeignKey(PaySpace, on_delete=models.CASCADE, null=True, related_name='persons')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='person', null=True)

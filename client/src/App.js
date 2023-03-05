@@ -10,12 +10,11 @@ import ExpenseList from './features/expenses/expenseListComponent';
 import ItemModal from './features/expenses/itemModal';
 import LoadingAnimation from './components/LoadingAnimation';
 import LoadingModal from './components/LoadingModal';
+import RegistrationView from './features/persons/registrationView';
 
 import { fetchCalculation, showCalculationModal } from './features/calculation/calculationSlice';
 import { fetchExpenses, fetchNextExpensePage, createNew } from './features/expenses/expensesSlice';
 import { fetchCurrentUser, fetchPersons } from './features/persons/personsSlice';
-
-import client from './client';
 
 import auth from './auth';
 
@@ -33,7 +32,11 @@ class App extends Component {
             this.props.fetchCurrentUser();
             this.props.fetchCalculation();
         } else {
-            client.register_device(this.loadData);
+            const token = window.location.hash.slice(1);
+            if (token) {
+                auth.setAuthToken(token);
+                window.location = '/';
+            }
         }
     }
 
@@ -51,6 +54,7 @@ class App extends Component {
         let contentDisplay = '';
         let summaryDisplay = '';
         let nextPageControl = '';
+        let registrationView = '';
         if (this.props.hasData) {
             if (this.props.isNewPageLoading) {
                 nextPageControl = <LoadingAnimation />
@@ -77,6 +81,9 @@ class App extends Component {
                 </div>
             );
         }
+        if (!auth.hasAuthToken()) {
+            registrationView = <RegistrationView />;
+        }
 
         return (
             <div>
@@ -87,6 +94,28 @@ class App extends Component {
                         </div>
                     </div>
                     <div className='navbar-end'>
+
+                        <div className="navbar-item has-dropdown is-hoverable">
+                            <a className="navbar-link">
+                                More
+                            </a>
+
+                            <div className="navbar-dropdown">
+                                <a className="navbar-item">
+                                    About
+                                </a>
+                                <a className="navbar-item">
+                                    Jobs
+                                </a>
+                                <a className="navbar-item">
+                                    Contact
+                                </a>
+                                <hr className="navbar-divider"></hr>
+                                <a className="navbar-item">
+                                    Report an issue
+                                </a>
+                            </div>
+                        </div>
                         <div className='buttons navbar-item'>
                             {summaryDisplay}
                             <Button onClick={() => this.props.createNew()}>Add New</Button>
@@ -99,6 +128,7 @@ class App extends Component {
                 <ItemModal />
                 <CalculationDetails />
                 <LoadingModal />
+                {registrationView}
             </div>
         );
     }

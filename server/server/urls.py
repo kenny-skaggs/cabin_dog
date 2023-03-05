@@ -11,7 +11,8 @@ router.register(r'person', views.PersonViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('register/', views.RegisterView.as_view(), name='register'),
+    path('add/person/<household_ref>/', views.AddPersonView.as_view()),
+    path('add/device/<person_ref>/', views.AddDeviceView.as_view()),
     path('user/', views.CurrentUserView.as_view()),
     path('calculation/', views.CalculationView.as_view()),
     path('payment/', views.PaymentView.as_view())

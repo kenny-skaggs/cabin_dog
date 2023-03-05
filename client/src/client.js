@@ -35,10 +35,6 @@ export class Client {
     delete = (url) => {
         return axios.delete(url);
     }
-
-    register_device = debouncedCallable((callback) => {
-        this.post('/register/').then(token => auth.setAuthToken(token.data)).then(callback);
-    });
 };
 
 export default new Client();
